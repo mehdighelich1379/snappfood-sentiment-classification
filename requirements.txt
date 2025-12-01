@@ -1,0 +1,7 @@
+streamlit
+hazm
+joblib
+scikit-learn
+pandas
+numpy
+emoji
