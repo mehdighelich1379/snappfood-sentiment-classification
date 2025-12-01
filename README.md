@@ -1,29 +1,57 @@
-# SnappFood Sentiment Classification
+<div dir="rtl">
 
-This project performs sentiment analysis on SnappFood user reviews using classic Machine Learning approaches:
-- Naive Bayes
-- Logistic Regression
-- Support Vector Machine (SVM)
+# 🍽️ تحلیل احساسات نظرات اسنپ‌فود (SnappFood Sentiment Analysis)
 
-## Dataset
-User review dataset collected from SnappFood platform (Persian texts).
-Labels:
-- Positive
-- Negative
+این پروژه یک سیستم تحلیل احساسات فارسی است که روی نظرات کاربران **اسنپ‌فود** آموزش داده شده.
+مدل با استفاده از تکنیک‌های **پردازش زبان طبیعی (NLP)** و الگوریتم **Logistic Regression** ساخته شده و می‌تواند تشخیص دهد که متن ورودی **مثبت** است یا **منفی** و همچنین میزان اطمینان مدل را نمایش دهد.
 
-## Project Structure
-See folders for data processing, modeling, and results.
+---
 
-## Technologies
-- Python 3.11
-- scikit-learn
-- Pandas
-- NumPy
-- Matplotlib
-- Hazm (Persian NLP)
+## 🚀 نسخه آنلاین
 
-## Roadmap
-- [ ] Data collection and clean-up
-- [ ] Exploratory Data Analysis (EDA)
-- [ ] Feature extraction (TF-IDF)
-- [ ] Train and evaluate classic ML models
+برای تست آنلاین و بدون نیاز به نصب، وارد لینک زیر شوید:
+
+🔗 **https://huggingface.co/spaces/Mehdighelich/snappfood-sentiment**
+
+### 🎥 دموی برنامه
+
+<p align="center">
+<img src="results/Demo.png" width="750px">
+</p>
+
+
+---
+
+## 🧠 مدل و روش کار
+
+- مدل یادگیری ماشین: **Logistic Regression**
+- زبان: **فارسی**
+- روش بردارسازی متن: **TF-IDF**
+- ابزار NLP فارسی: **Hazm**
+- رابط کاربری: **Streamlit**
+- محل اجرای نهایی: **Hugging Face Spaces**
+
+---
+
+## 📊 نتایج ارزیابی مدل
+
+| بخش                     | Accuracy | Precision | Recall | F1-Score | AUC    |
+| ----------------------- | -------- | --------- | ------ | -------- | ------ |
+| آموزش (Train)           | 0.8917   | 0.8590    | 0.9355 | 0.8956   | 0.9570 |
+| اعتبارسنجی (Validation) | 0.8589   | 0.8226    | 0.9131 | 0.8655   | 0.9286 |
+| تست (Test)              | 0.8596   | 0.8326    | 0.9026 | 0.8662   | 0.9244 |
+
+🔹 نتیجه: با وجود اینکه مدل ساده است، عملکرد بسیار قابل قبول و متعادلی دارد.
+
+---
+
+## 🛠️ تکنولوژی‌های مورد استفاده
+
+| بخش         | ابزار               |
+| ----------- | ------------------- |
+| NLP فارسی   | `hazm`              |
+| مدل ML      | `scikit-learn`      |
+| رابط کاربری | `streamlit`         |
+| ذخیره مدل   | `joblib`            |
+| Deployment  | Hugging Face Spaces |
+
