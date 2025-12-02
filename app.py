@@ -4,30 +4,55 @@ import re
 from hazm import Normalizer, WordTokenizer, Lemmatizer
 
 
-# ---------------- UI Styling ----------------
+# ---------------- UI Theme ----------------
+st.set_page_config(page_title="SnappFood Sentiment Model", layout="centered")
+
 st.markdown("""
 <style>
+/* Font + RTL */
+html, body, div, h1, h2, h3, p, label {
+    direction: rtl;
+    text-align: center !important;
+    font-family: "IRANSans", sans-serif;
+}
+/* Background */
 [data-testid="stAppViewContainer"] {
     background: linear-gradient(135deg, #fff7ec 0%, #ffe0d9 100%);
 }
-
-h1, h2, h3, .stTextInput label {
+/* Titles */
+h1, h2, h3 {
     color: #ff3b30;
+    font-weight: bold;
 }
-
-.stButton button {
+/* Center button */
+.stButton > button {
     background-color: #ff3b30;
     color: white;
-    font-weight: bold;
+    font-size: 18px;
+    padding: 8px 25px;
     border-radius: 10px;
+    display: block;
+    margin: auto;
+    cursor: pointer;
+}
+/* Text Area */
+textarea {
+    text-align: right !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
 
-# ---------------- Load Model & Vectorizer ----------------
-model = joblib.load("models/model_logistic.pkl")
-vectorizer = joblib.load("models/vectorizer.pkl")
+
+# ---------------- Load Model ----------------
+@st.cache_resource
+def load_model():
+    model = joblib.load("models/model_logistic.pkl")
+    vectorizer = joblib.load("models/vectorizer.pkl")
+    return model, vectorizer
+
+model, vectorizer = load_model()
+
 
 
 # ---------------- Text Preprocessing ----------------
@@ -40,51 +65,66 @@ def preprocess(text):
     text = re.sub(r"http\S+|www\S+|@\S+|#\S+", "", text)
     text = re.sub(r"[^\w\s]", " ", text)
     text = re.sub(r"\d+", "", text)
-    token = tokenizer.tokenize(text)
-    token = [lemmatizer.lemmatize(word) for word in token]
-    return " ".join(token)
+    tokens = tokenizer.tokenize(text)
+    tokens = [lemmatizer.lemmatize(word) for word in tokens]
+    return " ".join(tokens)
 
 
-# ---------------- Prediction Function ----------------
+
+# ---------------- Model Prediction ----------------
 def predict_sentiment(text, threshold=0.5):
     cleaned = preprocess(text)
     vec = vectorizer.transform([cleaned])
 
-    prob = model.predict_proba(vec)[0][1]  # probability of negative class
-    label = 1 if prob > threshold else 0
+    negative_prob = model.predict_proba(vec)[0][1]
 
-    if label == 1:
-        return "❌ نظر منفی", prob
+    if negative_prob > threshold:
+        return "negative", negative_prob
     else:
-        return "✨ نظر مثبت", prob
+        return "positive", 1 - negative_prob
 
 
-# ---------------- Streamlit UI ----------------
-st.set_page_config(page_title="Persian SnappFood Sentiment Model", layout="centered")
 
+# ---------------- UI ----------------
 st.title("🍽️ تحلیل احساسات نظرات اسنپ‌فود")
 
 st.write("""
-✨ این ابزار با استفاده از **پردازش زبان طبیعی** و مدل **یادگیری ماشین**
-به شما کمک می‌کنه بفهمید یک نظر **مثبت** بوده یا **منفی**.
+✨ با کمک **پردازش زبان طبیعی** و **یادگیری ماشین**  
+این ابزار بررسی می‌کنه آیا متن شما **مثبت**ه یا **منفی** 👇
+""")
 
-🔍 فقط یک جمله وارد کن و روی دکمه تحلیل بزن 👇
-        """)
+text_input = st.text_area("✍️ متن نظر:", placeholder="مثال: غذا عالی بود ولی خیلی دیر رسید!")
 
-
-
-text_input = st.text_area("✍️ یک جمله بنویس...", placeholder="مثال: غذا عالی بود اما دیر رسید")
-
-if st.button("تحلیل کن 🔍"):
+if st.button("🔍 تحلیل کن"):
 
     if text_input.strip() == "":
-        st.warning("⚠ لطفا یک جمله وارد کن!")
+        st.warning("⚠ لطفاً یک جمله وارد کنید.")
+
     else:
-        sentiment, prob = predict_sentiment(text_input)
+        label, confidence = predict_sentiment(text_input)
 
-        st.subheader("🔎 نتیجه مدل:")
-
-        if "منفی" in sentiment:
-            st.error(f"{sentiment}  | احتمال: {prob*100:.2f}%")
+        if label == "negative":
+            box_color = "#e63946"
+            emoji = "😡"
+            msg = "نظر منفی ❌"
         else:
-            st.success(f"{sentiment}  | احتمال: {prob*100:.2f}%")
+            box_color = "#20c997"
+            emoji = "😎"
+            msg = "نظر مثبت ✨"
+
+        # Result UI
+        st.markdown(
+            f"""
+            <div style="padding:15px; margin-top:15px;
+                        border-radius:12px; background-color:{box_color};
+                        color:white; font-size:22px; font-weight:bold;">
+                {emoji} {msg}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # Confidence Display
+        st.write("🎯 **درجه اطمینان مدل:**")
+        st.progress(confidence)
+        st.info(f"📌 مدل با **{confidence*100:.2f}%** اطمینان این نتیجه را اعلام کرده است.")
