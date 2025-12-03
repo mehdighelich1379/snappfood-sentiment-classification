@@ -50,7 +50,7 @@
 | بخش         | ابزار               |
 | ----------- | ------------------- |
 | NLP فارسی   | `hazm`              |
-| مدل ML      | `scikit-learn & LSTM`|
+| مدل (ML, DL) | `Logistic Regression & LSTM`|
 | رابط کاربری | `streamlit`         |
 | ذخیره مدل   | `joblib`            |
 | Deployment  | Hugging Face Spaces |
